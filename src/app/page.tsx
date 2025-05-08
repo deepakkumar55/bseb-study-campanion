@@ -824,7 +824,7 @@ export default function Home() {
                     opacity: 0,
                     animation: "fade-in-up 0.6s forwards",
                     animationDelay: feature.delay,
-                  }}
+                  } as React.CSSProperties}
                   onMouseEnter={() => {
                     setActiveFeature(index);
                     handleButtonFocus(feature.color);
