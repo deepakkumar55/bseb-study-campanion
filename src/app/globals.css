@@ -86,8 +86,6 @@ body {
   background-attachment: fixed;
   overflow-x: hidden;
   position: relative;
-  content-visibility: auto;
-  contain-intrinsic-size: 1px 5000px; /* Estimate of page height */
 }
 
 body::before {
@@ -113,9 +111,6 @@ body::before {
   transition: all var(--speed-medium) var(--bezier-smooth);
   position: relative;
   overflow: hidden;
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .glass-card::after {
@@ -153,9 +148,6 @@ body::before {
   border-radius: 2rem;
   box-shadow: var(--neo-shadow);
   transition: all var(--speed-medium) var(--bezier-smooth);
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .neo-card:hover {
@@ -179,8 +171,6 @@ body::before {
   transform-style: preserve-3d;
   perspective: var(--perspective);
   will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .card-3d::before {
@@ -308,9 +298,6 @@ body::before {
   z-index: 1;
   background-size: 200% auto;
   animation: gradient-shift 3s infinite alternate;
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .btn-fancy::before {
@@ -345,9 +332,6 @@ body::before {
 .spotlight {
   position: relative;
   overflow: hidden;
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .spotlight::after {
@@ -513,9 +497,6 @@ body::before {
 .water-effect {
   position: relative;
   overflow: hidden;
-  will-change: transform;
-  backface-visibility: hidden;
-  transform: translateZ(0);
 }
 
 .water-effect::before {
@@ -788,32 +769,4 @@ input::placeholder {
 input:focus {
   border-color: var(--primary);
   box-shadow: 0 0 0 2px var(--primary-foreground), 0 0 0 4px var(--primary);
-}
-
-/* Add prefers-reduced-motion support */
-@media (prefers-reduced-motion: reduce) {
-  *, ::before, ::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: 0.01ms !important;
-    scroll-behavior: auto !important;
-  }
-  
-  .float, .float-delayed, .float-more-delayed, .float-x, .float-combo,
-  .animate-bounce, .animate-fade-in, .animate-fade-in-up {
-    animation: none !important;
-    transform: none !important;
-  }
-}
-
-/* Critical rendering path optimization - load only essential animations early */
-@layer utilities {
-  .cr-animation {
-    animation-play-state: paused;
-  }
-}
-
-/* Load non-critical animations after page load */
-.loaded .cr-animation {
-  animation-play-state: running;
 }
