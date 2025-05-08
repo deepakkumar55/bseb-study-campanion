@@ -192,8 +192,8 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
     window.addEventListener("resize", handleResize);
     handleResize();
 
-    // Initialize mouse object
-    const mouse = {
+    // Initialize mouse object with explicit type annotation
+    const mouse: { x: number | undefined; y: number | undefined } = {
       x: undefined,
       y: undefined,
     };
