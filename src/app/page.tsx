@@ -71,6 +71,8 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
       distance: number;
       friction: number;
       ease: number;
+      canvasWidth: number;
+      canvasHeight: number;
 
       constructor(
         x: number,
@@ -94,6 +96,9 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
         this.distance = 0;
         this.friction = 0.95;
         this.ease = 0.1;
+        // Store canvas dimensions at creation time to avoid null checks later
+        this.canvasWidth = canvas.width;
+        this.canvasHeight = canvas.height;
       }
 
       draw() {
@@ -112,12 +117,12 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
         } else {
           // Get center position of the active subject
           const subjectCenter = {
-            x: canvas.width / 2,
-            y: canvas.height / 2,
+            x: this.canvasWidth / 2,
+            y: this.canvasHeight / 2,
           };
 
           // Calculate force and angle based on distance from mouse
-          if (mouse.x !== undefined) {
+          if (mouse.x !== undefined && mouse.y !== undefined) {
             this.distance = Math.sqrt(
               (this.x - mouse.x) ** 2 + (this.y - mouse.y) ** 2
             );
@@ -148,9 +153,9 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
 
         // Boundary check
         if (this.x < 0) this.x = 0;
-        if (this.x > canvas.width) this.x = canvas.width;
+        if (this.x > this.canvasWidth) this.x = this.canvasWidth;
         if (this.y < 0) this.y = 0;
-        if (this.y > canvas.height) this.y = canvas.height;
+        if (this.y > this.canvasHeight) this.y = this.canvasHeight;
 
         this.draw();
       }
