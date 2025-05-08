@@ -50,6 +50,10 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Store canvas dimensions in local variables after null checks
+    const canvasWidth = canvas.width;
+    const canvasHeight = canvas.height;
+
     const particles: any[] = [];
     const colors = subjects.map((subject) => subject.color);
 
@@ -78,7 +82,9 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
         x: number,
         y: number,
         color: string,
-        ctx: CanvasRenderingContext2D
+        ctx: CanvasRenderingContext2D,
+        width: number,
+        height: number
       ) {
         this.x = x;
         this.y = y;
@@ -96,9 +102,9 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
         this.distance = 0;
         this.friction = 0.95;
         this.ease = 0.1;
-        // Store canvas dimensions at creation time to avoid null checks later
-        this.canvasWidth = canvas.width;
-        this.canvasHeight = canvas.height;
+        // Use the values passed in parameters instead of accessing canvas directly
+        this.canvasWidth = width;
+        this.canvasHeight = height;
       }
 
       draw() {
@@ -168,9 +174,10 @@ const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
 
       for (let i = 0; i < subjects.length; i++) {
         for (let j = 0; j < particlesPerSubject; j++) {
-          const x = Math.random() * canvas.width;
-          const y = Math.random() * canvas.height;
-          particles.push(new Particle(x, y, colors[i], ctx));
+          const x = Math.random() * canvasWidth;
+          const y = Math.random() * canvasHeight;
+          // Pass canvasWidth and canvasHeight to the constructor
+          particles.push(new Particle(x, y, colors[i], ctx, canvasWidth, canvasHeight));
         }
       }
     };
