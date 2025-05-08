@@ -4,9 +4,9 @@ import Image from "next/image";
 
 // Create a custom hook for parallax effects
 function useParallax() {
-  const parallaxRef = useRef(null);
+  const parallaxRef = useRef<HTMLDivElement | null>(null);
 
-  const handleMouseMove = useCallback((e) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!parallaxRef.current) return;
 
     const container = parallaxRef.current;
@@ -17,7 +17,7 @@ function useParallax() {
     const relY = e.clientY - containerRect.top - containerRect.height / 2;
 
     layers.forEach((layer) => {
-      const speed = parseFloat(layer.getAttribute("data-parallax-layer"));
+      const speed = parseFloat(layer.getAttribute("data-parallax-layer") || "0");
       const x = relX * speed * 0.01;
       const y = relY * speed * 0.01;
       layer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
@@ -38,154 +38,46 @@ function useParallax() {
   return parallaxRef;
 }
 
-// WebGL Background Component
-const WebGLBackground = () => {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const gl = canvas.getContext("webgl");
-    if (!gl) return;
-
-    const vertexShader = `
-      attribute vec2 position;
-      void main() {
-        gl_Position = vec4(position, 0.0, 1.0);
-      }
-    `;
-
-    const fragmentShader = `
-      precision mediump float;
-      uniform float time;
-      uniform vec2 resolution;
-
-      vec3 palette(float t) {
-        vec3 a = vec3(0.5, 0.5, 0.5);
-        vec3 b = vec3(0.5, 0.5, 0.5);
-        vec3 c = vec3(1.0, 1.0, 1.0);
-        vec3 d = vec3(0.263, 0.416, 0.557);
-        return a + b * cos(6.28318 * (c * t + d));
-      }
-
-      void main() {
-        vec2 uv = (gl_FragCoord.xy * 2.0 - resolution) / min(resolution.x, resolution.y);
-        vec2 uv0 = uv;
-
-        vec3 finalColor = vec3(0.0);
-
-        for (float i = 0.0; i < 4.0; i++) {
-          uv = fract(uv * 1.5) - 0.5;
-
-          float d = length(uv) * exp(-length(uv0));
-
-          vec3 col = palette(length(uv0) + i * 0.4 + time * 0.4);
-
-          d = sin(d * 8.0 + time) / 8.0;
-          d = abs(d);
-          d = pow(0.01 / d, 1.2);
-
-          finalColor += col * d;
-        }
-
-        gl_FragColor = vec4(finalColor, 1.0);
-      }
-    `;
-
-    // Compile shaders
-    const vs = gl.createShader(gl.VERTEX_SHADER);
-    gl.shaderSource(vs, vertexShader);
-    gl.compileShader(vs);
-
-    const fs = gl.createShader(gl.FRAGMENT_SHADER);
-    gl.shaderSource(fs, fragmentShader);
-    gl.compileShader(fs);
-
-    // Create program
-    const program = gl.createProgram();
-    gl.attachShader(program, vs);
-    gl.attachShader(program, fs);
-    gl.linkProgram(program);
-    gl.useProgram(program);
-
-    // Set up buffers
-    const buffer = gl.createBuffer();
-    gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-    gl.bufferData(
-      gl.ARRAY_BUFFER,
-      new Float32Array([-1, -1, 1, -1, -1, 1, 1, 1]),
-      gl.STATIC_DRAW
-    );
-
-    // Set up attributes
-    const positionLocation = gl.getAttribLocation(program, "position");
-    gl.enableVertexAttribArray(positionLocation);
-    gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
-
-    // Set up uniforms
-    const timeLocation = gl.getUniformLocation(program, "time");
-    const resolutionLocation = gl.getUniformLocation(program, "resolution");
-
-    // Resize canvas
-    const resize = () => {
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
-      gl.viewport(0, 0, canvas.width, canvas.height);
-      gl.uniform2f(resolutionLocation, canvas.width, canvas.height);
-    };
-
-    window.addEventListener("resize", resize);
-    resize();
-
-    // Animation loop
-    let startTime = Date.now();
-    const animate = () => {
-      const time = (Date.now() - startTime) * 0.001;
-      gl.uniform1f(timeLocation, time);
-
-      gl.clearColor(0, 0, 0, 0);
-      gl.clear(gl.COLOR_BUFFER_BIT);
-      gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-
-      requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    return () => {
-      window.removeEventListener("resize", resize);
-      gl.deleteProgram(program);
-      gl.deleteShader(vs);
-      gl.deleteShader(fs);
-      gl.deleteBuffer(buffer);
-    };
-  }, []);
-
-  return (
-    <canvas
-      ref={canvasRef}
-      className="absolute top-0 left-0 w-full h-full -z-10 opacity-30"
-    />
-  );
-};
-
 // Creating an interactive particle system for subject visualization
-const ParticleExplorer = ({ subjects }) => {
-  const canvasRef = useRef(null);
-  const [activeIndex, setActiveIndex] = useState(null);
+const ParticleExplorer = ({ subjects }: { subjects: any[] }) => {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
   useEffect(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
     const ctx = canvas.getContext("2d");
-    const particles = [];
+    if (!ctx) return;
+
+    const particles: any[] = [];
     const colors = subjects.map((subject) => subject.color);
 
     // Particle class
     class Particle {
-      constructor(x, y, color, ctx) {
+      x: number;
+      y: number;
+      origX: number;
+      origY: number;
+      color: string;
+      size: number;
+      ctx: CanvasRenderingContext2D;
+      dx: number;
+      dy: number;
+      vx: number;
+      vy: number;
+      force: number;
+      angle: number;
+      distance: number;
+      friction: number;
+      ease: number;
+
+      constructor(
+        x: number,
+        y: number,
+        color: string,
+        ctx: CanvasRenderingContext2D
+      ) {
         this.x = x;
         this.y = y;
         this.origX = x;
@@ -212,7 +104,7 @@ const ParticleExplorer = ({ subjects }) => {
         this.ctx.fill();
       }
 
-      update(mouse, activeIndex) {
+      update(mouse: { x: number | undefined; y: number | undefined }, activeIndex: number | null) {
         // Return to original position when no subject is active
         if (activeIndex === null) {
           this.vx = (this.origX - this.x) * this.ease;
@@ -295,7 +187,7 @@ const ParticleExplorer = ({ subjects }) => {
     };
 
     // Mouse move event
-    canvas.addEventListener("mousemove", (e) => {
+    canvas.addEventListener("mousemove", (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       mouse.x = e.clientX - rect.left;
       mouse.y = e.clientY - rect.top;
@@ -360,7 +252,7 @@ const ParticleExplorer = ({ subjects }) => {
 // Main component
 export default function Home() {
   // Interactive states
-  const [activeFeature, setActiveFeature] = useState(null);
+  const [activeFeature, setActiveFeature] = useState<number | null>(null);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const [scrollY, setScrollY] = useState(0);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -373,9 +265,9 @@ export default function Home() {
   });
 
   // Refs
-  const heroRef = useRef(null);
-  const cursorRef = useRef(null);
-  const timelineRef = useRef(null);
+  const heroRef = useRef<HTMLDivElement | null>(null);
+  const cursorRef = useRef<HTMLDivElement | null>(null);
+  const timelineRef = useRef<HTMLDivElement | null>(null);
   const parallaxRef = useParallax();
 
   // Simulate loading
@@ -385,7 +277,7 @@ export default function Home() {
 
   // Track mouse movement for spotlight and cursor effects
   useEffect(() => {
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: MouseEvent) => {
       // Update general mouse position
       if (heroRef.current) {
         const rect = heroRef.current.getBoundingClientRect();
@@ -451,7 +343,7 @@ export default function Home() {
   }, []);
 
   // Handle button hover states
-  const handleButtonFocus = (color) => {
+  const handleButtonFocus = (color: string) => {
     setIsHovering(true);
     setCursorStyle((prev) => ({ ...prev, size: 60, color }));
   };
@@ -466,7 +358,7 @@ export default function Home() {
   };
 
   // Interactive smooth scroll
-  const scrollToSection = (id) => {
+  const scrollToSection = (id: string) => {
     const element = document.getElementById(id);
     if (element) {
       window.scrollTo({
@@ -643,9 +535,6 @@ export default function Home() {
 
   return (
     <>
-      {/* WebGL Background */}
-      <WebGLBackground />
-
       {/* Custom cursor */}
       <div
         ref={cursorRef}
@@ -830,7 +719,7 @@ export default function Home() {
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 strokeWidth="2"
-                d="M19 14l-7 7m0 0l-7-7m7 7V3"
+                d="M19 14l-7 7m0 0l-7-7m7-7H3"
               ></path>
             </svg>
           </div>
@@ -1266,7 +1155,13 @@ export default function Home() {
 }
 
 // Animation utility components
-const CountUpAnimation = ({ end, duration = 2, decimals = 0 }) => {
+interface CountUpAnimationProps {
+  end: number;
+  duration?: number;
+  decimals?: number;
+}
+
+const CountUpAnimation = ({ end, duration = 2, decimals = 0 }: CountUpAnimationProps) => {
   const [count, setCount] = useState(0);
   const countRef = useRef(0);
   const frameRef = useRef(0);
