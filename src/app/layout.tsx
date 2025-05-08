@@ -18,7 +18,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BSEB Study Companion | Ultimate Class 12 Science Platform",
+  title: "BSEBCampusCoders Study Companion | Ultimate Class 12 Science Platform",
   description: "Elevate your BSEB Class 12 Science preparation with previous year papers, tests, quizzes, notes, and a supportive community.",
   keywords: "BSEB, Class 12, Science, Study Companion, Exam Preparation, Bihar Board, Physics, Chemistry, Mathematics, Biology, English",
   authors: [{ name: "BSEB Study Companion Team" }],
