@@ -31,7 +31,7 @@ This document outlines how you can get involved.
 ### 1. Fork & Clone
 
 ```bash
-git clone https://github.com/deepakkumar55/bseb-study-campanion
+git clone https://github.com/deepakkumar55/bseb-study-campanion.git
 cd bseb-study-companion
 ````
 

@@ -65,7 +65,7 @@ It provides a modern and structured approach to exam prep, featuring:
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/thecampuscoders/bseb-study-companion.git
+git clone https://github.com/deepakkumar55/bseb-study-campanion.git
 cd bseb-study-companion
 ````
 
@@ -108,6 +108,21 @@ To deploy your own version on [Vercel](https://vercel.com):
 
 ## 🤝 Contributing
 > Please refer to [`CONTRIBUTING.md`](CONTRIBUTING.md) for detailed contribution guidelines.
+
+---
+
+## 👨‍💻 Contributors
+
+Thanks to these amazing people for making this project better!  
+Want to join the list? [Start here →](https://github.com/deepakkumar55/bseb-study-campanion/graphs/contributors)
+
+
+<table>
+  <tr>
+    <td align="center"><a href="https://github.com/deepakkumar55"><img style="border-radius: 50%" src="https://avatars.githubusercontent.com/u/101995144?v=4" width="100px;" alt=""/><br /><sub><b>Deepak Kumar</b></sub></a><br />💻 Project Owner</td>
+    <!-- Add more contributors as they join -->
+  </tr>
+</table>
 
 ---
 
