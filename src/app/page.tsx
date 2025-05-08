@@ -20,7 +20,7 @@ function useParallax() {
       const speed = parseFloat(layer.getAttribute("data-parallax-layer") || "0");
       const x = relX * speed * 0.01;
       const y = relY * speed * 0.01;
-      layer.style.transform = `translate3d(${x}px, ${y}px, 0)`;
+      (layer as HTMLElement).style.transform = `translate3d(${x}px, ${y}px, 0)`;
     });
   }, []);
 
@@ -324,7 +324,7 @@ export default function Home() {
       parallaxElements.forEach((el) => {
         const speed = parseFloat(el.getAttribute("data-parallax") || "0.1");
         const offset = window.scrollY * speed;
-        el.style.transform = `translateY(${offset}px)`;
+        (el as HTMLElement).style.transform = `translateY(${offset}px)`;
       });
     };
 
